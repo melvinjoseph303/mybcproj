@@ -1,0 +1,24 @@
+{
+  "registrar-property-com": {
+    "AnchorPeers": {
+      "mod_policy": "Admins",
+      "value": {
+        "anchor_peers": [
+           { "host": "192.168.42.79", "port": "7002" }
+        ]
+      },
+      "version": "0"
+    }
+  },
+  "user-property-com": {
+    "AnchorPeers": {
+      "mod_policy": "Admins",
+      "value": {
+        "anchor_peers": [
+           { "host": "192.168.42.79", "port": "7003" }
+        ]
+      },
+      "version": "0"
+    }
+  }
+}

@@ -1,0 +1,4 @@
+keyUsage = critical,digitalSignature
+basicConstraints = critical,CA:FALSE
+subjectAltName=IP: 192.168.42.79,DNS:peer1.registrar.property.com,DNS:peer1-registrar-property-com,DNS:localhost,IP:127.0.0.1
+authorityKeyIdentifier = keyid,issuer

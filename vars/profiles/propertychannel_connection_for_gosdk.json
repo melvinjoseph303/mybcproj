@@ -1,0 +1,165 @@
+{
+  "name": "5a00d5f7a0_net",
+  "x-comment-0": "ROOTPATH should be set to the absolute path of crypto material starting directory",
+  "x-comment-1": "for example: export ROOTPATH=/home/ubuntu/mywork/vars/keyfiles",
+  "x-type": "hlfv-2.3.0",
+  "version": "1.0.0",
+  "client": {
+    "organization": "user.property.com",
+    "cryptoconfig": {
+      "path": "${ROOTPATH}"
+    },
+    "connection": {
+      "timeout": {
+        "peer": { "endorser": "300", "eventHub": "300", "eventReg": "300"},
+        "orderer": "300"
+      }
+    }
+  },
+  "channels": {
+    "propertychannel": {
+      "orderers": [
+        "orderer1.property.com",
+        "orderer2.property.com"
+      ],
+      "peers": {
+        "peer1.registrar.property.com": {
+          "endorsingPeer": true, "chaincodeQuery": true, "eventSource": true
+        },
+        "peer1.user.property.com": {
+          "endorsingPeer": true, "chaincodeQuery": true, "eventSource": true
+        }
+      }
+    }
+  },
+  "organizations": {
+    "property.com": {
+      "mspid": "property-com",
+      "cryptoPath": "ordererOrganizations/property.com/users/{username}@property.com/msp",
+      "orderers": [
+        "orderer1.property.com",
+        "orderer2.property.com"
+      ],
+      "certificateAuthorities": [
+      ]
+    },
+    "registrar.property.com": {
+      "mspid": "registrar-property-com",
+      "cryptoPath": "peerOrganizations/registrar.property.com/users/{username}@registrar.property.com/msp",
+      "peers": [
+        "peer1.registrar.property.com"
+      ],
+      "certificateAuthorities": [
+       "ca1.registrar.property.com"
+      ]
+    },
+    "user.property.com": {
+      "mspid": "user-property-com",
+      "cryptoPath": "peerOrganizations/user.property.com/users/{username}@user.property.com/msp",
+      "peers": [
+        "peer1.user.property.com"
+      ],
+      "certificateAuthorities": [
+       "ca1.user.property.com"
+      ]
+    }
+  },
+  "orderers": {
+    "orderer1.property.com": {
+      "url": "grpcs://192.168.42.79:7006",
+      "grpcOptions": {
+        "ssl-target-name-override": "orderer1.property.com"
+      },
+      "tlsCACerts": {
+        "pem": "-----BEGIN CERTIFICATE-----\nMIICqDCCAk6gAwIBAgIUM7eqwvpICBi3yE1IsFtnq+WR1ZswCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAwDgYDVQQH\nDAdSYWxlaWdoMRUwEwYDVQQKDAxwcm9wZXJ0eS5jb20xGzAZBgNVBAMMEnRsc2Nh\nLnByb3BlcnR5LmNvbTAeFw0yMjAzMjkyMjI5NTVaFw0zMjAzMjYyMjI5NTVaMGwx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIDA5Ob3J0aCBDYXJvbGluYTEQMA4GA1UEBwwH\nUmFsZWlnaDEVMBMGA1UECgwMcHJvcGVydHkuY29tMRswGQYDVQQDDBJ0bHNjYS5w\ncm9wZXJ0eS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASBPzr/ahayA/u5\nQrmL8fdhkAplst5xtQiH0FakIqFqvaiuz8V65cvkRAV05AcQHysRdfDjjJIPM+Xz\npgrDgClio4HNMIHKMB0GA1UdDgQWBBR7VqNWb6pqcWB40zqdgik7bfa0EjAfBgNV\nHSMEGDAWgBR7VqNWb6pqcWB40zqdgik7bfa0EjAPBgNVHRMBAf8EBTADAQH/MA4G\nA1UdDwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwSAYD\nVR0RBEEwP4cEwKgqT4ISdGxzY2EucHJvcGVydHkuY29tghJ0bHNjYS1wcm9wZXJ0\neS1jb22CCWxvY2FsaG9zdIcEfwAAATAKBggqhkjOPQQDAgNIADBFAiEAyAZhmFR6\nyTJXXlFN92J1d9HW3082E5WCAWzmS/prXHsCIDbagNU+Db7oX8ebveinF61L2FXf\n5WPkHaLq/d5KWB1x\n-----END CERTIFICATE-----"
+      }
+    },
+    "orderer2.property.com": {
+      "url": "grpcs://192.168.42.79:7007",
+      "grpcOptions": {
+        "ssl-target-name-override": "orderer2.property.com"
+      },
+      "tlsCACerts": {
+        "pem": "-----BEGIN CERTIFICATE-----\nMIICqDCCAk6gAwIBAgIUM7eqwvpICBi3yE1IsFtnq+WR1ZswCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAwDgYDVQQH\nDAdSYWxlaWdoMRUwEwYDVQQKDAxwcm9wZXJ0eS5jb20xGzAZBgNVBAMMEnRsc2Nh\nLnByb3BlcnR5LmNvbTAeFw0yMjAzMjkyMjI5NTVaFw0zMjAzMjYyMjI5NTVaMGwx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIDA5Ob3J0aCBDYXJvbGluYTEQMA4GA1UEBwwH\nUmFsZWlnaDEVMBMGA1UECgwMcHJvcGVydHkuY29tMRswGQYDVQQDDBJ0bHNjYS5w\ncm9wZXJ0eS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASBPzr/ahayA/u5\nQrmL8fdhkAplst5xtQiH0FakIqFqvaiuz8V65cvkRAV05AcQHysRdfDjjJIPM+Xz\npgrDgClio4HNMIHKMB0GA1UdDgQWBBR7VqNWb6pqcWB40zqdgik7bfa0EjAfBgNV\nHSMEGDAWgBR7VqNWb6pqcWB40zqdgik7bfa0EjAPBgNVHRMBAf8EBTADAQH/MA4G\nA1UdDwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwSAYD\nVR0RBEEwP4cEwKgqT4ISdGxzY2EucHJvcGVydHkuY29tghJ0bHNjYS1wcm9wZXJ0\neS1jb22CCWxvY2FsaG9zdIcEfwAAATAKBggqhkjOPQQDAgNIADBFAiEAyAZhmFR6\nyTJXXlFN92J1d9HW3082E5WCAWzmS/prXHsCIDbagNU+Db7oX8ebveinF61L2FXf\n5WPkHaLq/d5KWB1x\n-----END CERTIFICATE-----"
+      }
+    }
+  },
+  "peers": {
+    "peer1.registrar.property.com": {
+      "url": "grpcs://192.168.42.79:7002",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer1.registrar.property.com"
+      },
+      "tlsCACerts": {
+        "pem": "-----BEGIN CERTIFICATE-----\nMIIC6jCCApCgAwIBAgIUSlBlMhTKj8ImDME8aaFNivSpTkAwCgYIKoZIzj0EAwIw\ngYExCzAJBgNVBAYTAlVTMRcwFQYDVQQIDA5Ob3J0aCBDYXJvbGluYTEQMA4GA1UE\nBwwHUmFsZWlnaDEfMB0GA1UECgwWcmVnaXN0cmFyLnByb3BlcnR5LmNvbTEmMCQG\nA1UEAwwddGxzY2ExLnJlZ2lzdHJhci5wcm9wZXJ0eS5jb20wHhcNMjIwMzI5MjIz\nMDI2WhcNMzIwMzI2MjIzMDI2WjCBgTELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5v\ncnRoIENhcm9saW5hMRAwDgYDVQQHDAdSYWxlaWdoMR8wHQYDVQQKDBZyZWdpc3Ry\nYXIucHJvcGVydHkuY29tMSYwJAYDVQQDDB10bHNjYTEucmVnaXN0cmFyLnByb3Bl\ncnR5LmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEUpEctsBTAxZgdp+DJD\nN6SAZhqoFoS53v0wd1iyZ2J3B43p6oWjDkL6WEmp4LisOEiWnRg/O1T3uSFfKIeo\nsOyjgeMwgeAwHQYDVR0OBBYEFJRVr8Asi9SkRLJ9+v0tX3ofJWAOMB8GA1UdIwQY\nMBaAFJRVr8Asi9SkRLJ9+v0tX3ofJWAOMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0P\nAQH/BAQDAgGmMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBeBgNVHREE\nVzBVhwTAqCpPgh10bHNjYTEucmVnaXN0cmFyLnByb3BlcnR5LmNvbYIddGxzY2Ex\nLXJlZ2lzdHJhci1wcm9wZXJ0eS1jb22CCWxvY2FsaG9zdIcEfwAAATAKBggqhkjO\nPQQDAgNIADBFAiEA8emiKbHBiR1DIZCpTHUxUgDGrza99hWzK4ApJPYti40CIEmB\nUfdwSxnj9G+n6vNMYz0QeIUAYc16fCZmZTDztjv9\n-----END CERTIFICATE-----"
+      }
+    },
+    "peer1.user.property.com": {
+      "url": "grpcs://192.168.42.79:7003",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer1.user.property.com"
+      },
+      "tlsCACerts": {
+        "pem": "-----BEGIN CERTIFICATE-----\nMIICyTCCAnCgAwIBAgIUYZvPr7nR9Uv1A6jDwNtay4rInUowCgYIKoZIzj0EAwIw\ndzELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAwDgYDVQQH\nDAdSYWxlaWdoMRowGAYDVQQKDBF1c2VyLnByb3BlcnR5LmNvbTEhMB8GA1UEAwwY\ndGxzY2ExLnVzZXIucHJvcGVydHkuY29tMB4XDTIyMDMyOTIyMzA0OVoXDTMyMDMy\nNjIyMzA0OVowdzELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5h\nMRAwDgYDVQQHDAdSYWxlaWdoMRowGAYDVQQKDBF1c2VyLnByb3BlcnR5LmNvbTEh\nMB8GA1UEAwwYdGxzY2ExLnVzZXIucHJvcGVydHkuY29tMFkwEwYHKoZIzj0CAQYI\nKoZIzj0DAQcDQgAECfl/rHDx8A+b6Ot4sPAycxQP6deLlsAdmI5/TxTfIdBGygwy\nRg+wZcErw4/KbrR6SpkZjvN9Pdu00rlPzWqpFKOB2TCB1jAdBgNVHQ4EFgQUV0je\nhgNerhOuNlOU/+1nkuJ+qGwwHwYDVR0jBBgwFoAUV0jehgNerhOuNlOU/+1nkuJ+\nqGwwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAaYwHQYDVR0lBBYwFAYI\nKwYBBQUHAwEGCCsGAQUFBwMCMFQGA1UdEQRNMEuHBMCoKk+CGHRsc2NhMS51c2Vy\nLnByb3BlcnR5LmNvbYIYdGxzY2ExLXVzZXItcHJvcGVydHktY29tgglsb2NhbGhv\nc3SHBH8AAAEwCgYIKoZIzj0EAwIDRwAwRAIgNfVY+lk9kVuq9R6N4G4wSzqbGfVF\nKV33aIZLX/metw4CICVspz/AjKer9+D1jd2a/jEsSsVFjStytpWSSQw2PAjq\n-----END CERTIFICATE-----"
+      }
+    }
+  },
+  "certificateAuthorities": {
+    "ca1.registrar.property.com": {
+      "url": "https://192.168.42.79:7000",
+      "tlsCACerts": {
+        "pem": ["-----BEGIN CERTIFICATE-----\nMIIC3TCCAoKgAwIBAgIUDQryMWqnUnYvHsI3K/R/O6IC4cIwCgYIKoZIzj0EAwIw\nfjELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAwDgYDVQQH\nDAdSYWxlaWdoMR8wHQYDVQQKDBZyZWdpc3RyYXIucHJvcGVydHkuY29tMSMwIQYD\nVQQDDBpjYTEucmVnaXN0cmFyLnByb3BlcnR5LmNvbTAeFw0yMjAzMjkyMjMwMjVa\nFw0zMjAzMjYyMjMwMjVaMH4xCzAJBgNVBAYTAlVTMRcwFQYDVQQIDA5Ob3J0aCBD\nYXJvbGluYTEQMA4GA1UEBwwHUmFsZWlnaDEfMB0GA1UECgwWcmVnaXN0cmFyLnBy\nb3BlcnR5LmNvbTEjMCEGA1UEAwwaY2ExLnJlZ2lzdHJhci5wcm9wZXJ0eS5jb20w\nWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARKfx4FaYQNq+ElUObD1oMQJKpqKK25\n6TKeAgGoTX4aGdYf0zR0NhkUzCszV2okw9fuTBsTnBR7EvpsMARQCkIYo4HdMIHa\nMB0GA1UdDgQWBBTps5XyGVXuX/ON9+rJvRI5BGrtOTAfBgNVHSMEGDAWgBTps5Xy\nGVXuX/ON9+rJvRI5BGrtOTAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIB\npjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwWAYDVR0RBFEwT4cEwKgq\nT4IaY2ExLnJlZ2lzdHJhci5wcm9wZXJ0eS5jb22CGmNhMS1yZWdpc3RyYXItcHJv\ncGVydHktY29tgglsb2NhbGhvc3SHBH8AAAEwCgYIKoZIzj0EAwIDSQAwRgIhAKfL\nuyd+R/Ml+OlNBEMuy9959Z+qxKOC4EmY1OtPTCIfAiEA+29gzrQYELgCOQJH5I9A\nl+3acKnuPEIUy8a6btWQjYo=\n-----END CERTIFICATE-----"]
+      },
+      "httpOptions": { "verify": "false" },
+      "caName": "ca1",
+      "registrar": { "enrollId": "admin", "enrollSecret": "adminpw" }
+    },
+    "ca1.user.property.com": {
+      "url": "https://192.168.42.79:7001",
+      "tlsCACerts": {
+        "pem": ["-----BEGIN CERTIFICATE-----\nMIICvjCCAmSgAwIBAgIUM9sLJic+9yl+/KRA9vY0ZWkV2gUwCgYIKoZIzj0EAwIw\ndDELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAwDgYDVQQH\nDAdSYWxlaWdoMRowGAYDVQQKDBF1c2VyLnByb3BlcnR5LmNvbTEeMBwGA1UEAwwV\nY2ExLnVzZXIucHJvcGVydHkuY29tMB4XDTIyMDMyOTIyMzA0OVoXDTMyMDMyNjIy\nMzA0OVowdDELMAkGA1UEBhMCVVMxFzAVBgNVBAgMDk5vcnRoIENhcm9saW5hMRAw\nDgYDVQQHDAdSYWxlaWdoMRowGAYDVQQKDBF1c2VyLnByb3BlcnR5LmNvbTEeMBwG\nA1UEAwwVY2ExLnVzZXIucHJvcGVydHkuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0D\nAQcDQgAEpnKbTPBpJmm/Gm2feU4zHagcOC4DC3O1e28gvFX6sGPcECMfK+FLdxjf\nRXbufLIJnmlB/PqhAUZ0mevMd6QwrKOB0zCB0DAdBgNVHQ4EFgQUEFrVy3qJErXB\nGKwf/+DFmcwKcn4wHwYDVR0jBBgwFoAUEFrVy3qJErXBGKwf/+DFmcwKcn4wDwYD\nVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAaYwHQYDVR0lBBYwFAYIKwYBBQUH\nAwEGCCsGAQUFBwMCME4GA1UdEQRHMEWHBMCoKk+CFWNhMS51c2VyLnByb3BlcnR5\nLmNvbYIVY2ExLXVzZXItcHJvcGVydHktY29tgglsb2NhbGhvc3SHBH8AAAEwCgYI\nKoZIzj0EAwIDSAAwRQIgZRTZOeHueY7K/zSgrysbWTkH+VJwfBUVgPJEpI7kQYoC\nIQCAcZR71Alsvxh0bE1ybGV7Hdk1+f0RWvxQVILik+8h9Q==\n-----END CERTIFICATE-----"]
+      },
+      "httpOptions": { "verify": "false" },
+      "caName": "ca1",
+      "registrar": { "enrollId": "admin", "enrollSecret": "adminpw" }
+    }
+  },
+  "entityMatchers": {
+    "orderer": [
+      { "mappedHost": "orderer1.property.com",
+        "pattern": "(\\w*)orderer1.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "orderer1.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7006"
+      },
+      { "mappedHost": "orderer2.property.com",
+        "pattern": "(\\w*)orderer2.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "orderer2.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7007"
+      }
+    ],
+    "peer": [
+      { "mappedHost": "peer1.registrar.property.com",
+        "pattern": "(\\w*)peer1.registrar.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "peer1.registrar.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7002"
+      },
+      { "mappedHost": "peer1.user.property.com",
+        "pattern": "(\\w*)peer1.user.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "peer1.user.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7003"
+      }
+    ],
+  "certificateAuthorities": [
+      { "mappedHost": "ca1.registrar.property.com",
+        "pattern": "(\\w*)ca1.registrar.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "ca1.registrar.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7000"
+      },
+      { "mappedHost": "ca1.user.property.com",
+        "pattern": "(\\w*)ca1.user.property.com(\\w*)",
+        "sslTargetOverrideUrlSubstitutionExp": "ca1.user.property.com",
+        "urlSubstitutionExp": "192.168.42.79:7001"
+      }
+    ]
+  }
+}

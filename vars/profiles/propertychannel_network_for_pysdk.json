@@ -1,0 +1,118 @@
+{
+  "name": "fabric-network",
+  "description": "Generated network configuration file",
+  "version": "0.1",
+  "client": {
+    "organization": "user.property.com",
+    "credentialStore": {
+      "path": "/tmp/hfc-kvs",
+      "cryptoStore": {
+        "path": "/tmp/hfc-cvs"
+      },
+      "wallet": "wallet-name"
+    }
+  },
+  "organizations": {
+    "property.com": {
+      "mspid": "property-com",
+      "orderers": [
+        "orderer1.property.com",
+        "orderer2.property.com"
+      ],
+      "users": {
+        "Admin": {
+          "cert": "/keyfiles/ordererOrganizations/property.com/users/Admin@property.com/msp/signcerts/Admin@property.com-cert.pem",
+          "private_key": "/keyfiles/ordererOrganizations/property.com/users/Admin@property.com/msp/keystore/priv_sk"
+        }
+      }
+    },
+    "registrar.property.com": {
+      "mspid": "registrar-property-com",
+      "peers": [
+        "peer1.registrar.property.com"
+      ],
+      "users": {
+        "Admin": {
+          "cert": "/keyfiles/peerOrganizations/registrar.property.com/users/Admin@registrar.property.com/msp/signcerts/Admin@registrar.property.com-cert.pem",
+          "private_key": "/keyfiles/peerOrganizations/registrar.property.com/users/Admin@registrar.property.com/msp/keystore/priv_sk"
+        }
+      }
+    },
+    "user.property.com": {
+      "mspid": "user-property-com",
+      "peers": [
+        "peer1.user.property.com"
+      ],
+      "users": {
+        "Admin": {
+          "cert": "/keyfiles/peerOrganizations/user.property.com/users/Admin@user.property.com/msp/signcerts/Admin@user.property.com-cert.pem",
+          "private_key": "/keyfiles/peerOrganizations/user.property.com/users/Admin@user.property.com/msp/keystore/priv_sk"
+        }
+      }
+    }
+  },
+  "orderers": {
+    "orderer1.property.com": {
+      "url": "192.168.42.79:7006",
+      "grpcOptions": {
+        "grpc.ssl_target_name_override": "orderer1.property.com",
+        "grpc-max-send-message-length": 15
+      },
+      "tlsCACerts": {
+        "path": "/keyfiles/ordererOrganizations/property.com/orderers/orderer1.property.com/tls/ca.crt"
+      }
+    },
+    "orderer2.property.com": {
+      "url": "192.168.42.79:7007",
+      "grpcOptions": {
+        "grpc.ssl_target_name_override": "orderer2.property.com",
+        "grpc-max-send-message-length": 15
+      },
+      "tlsCACerts": {
+        "path": "/keyfiles/ordererOrganizations/property.com/orderers/orderer2.property.com/tls/ca.crt"
+      }
+    }
+  },
+  "peers": {
+    "peer1.registrar.property.com": {
+      "url": "192.168.42.79:7002",
+      "grpcOptions": {
+        "grpc.ssl_target_name_override": "peer1.registrar.property.com",
+        "grpc-max-send-message-length": 15
+      },
+      "tlsCACerts": {
+        "path": "/keyfiles/peerOrganizations/registrar.property.com/peers/peer1.registrar.property.com/tls/ca.crt"
+      }
+    },
+    "peer1.user.property.com": {
+      "url": "192.168.42.79:7003",
+      "grpcOptions": {
+        "grpc.ssl_target_name_override": "peer1.user.property.com",
+        "grpc-max-send-message-length": 15
+      },
+      "tlsCACerts": {
+        "path": "/keyfiles/peerOrganizations/user.property.com/peers/peer1.user.property.com/tls/ca.crt"
+      }
+    }
+  },
+  "certificateAuthorities": {
+    "ca1.registrar.property.com": {
+      "url": "https://192.168.42.79:7000",
+      "tlsCACerts": {
+        "path": "/keyfiles/peerOrganizations/registrar.property.com/ca/ca1.registrar.property.com-cert.pem"
+      },
+      "httpOptions": { "verify": "false" },
+      "caName": "ca1",
+      "registrar": { "enrollId": "admin", "enrollSecret": "adminpw" }
+    },
+    "ca1.user.property.com": {
+      "url": "https://192.168.42.79:7001",
+      "tlsCACerts": {
+        "path": "/keyfiles/peerOrganizations/user.property.com/ca/ca1.user.property.com-cert.pem"
+      },
+      "httpOptions": { "verify": "false" },
+      "caName": "ca1",
+      "registrar": { "enrollId": "admin", "enrollSecret": "adminpw" }
+    }
+  }
+}

@@ -1,0 +1,175 @@
+---
+Organizations:
+  - &property-com
+      Name: property-com
+      ID: property-com
+      MSPDir: keyfiles/ordererOrganizations/property.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('property-com.member')"
+        Writers:
+          Type: Signature
+          Rule: "OR('property-com.member')"
+        Admins:
+          Type: Signature
+          Rule: "OR('property-com.admin')"
+  - &registrar-property-com
+      Name: registrar-property-com
+      ID: registrar-property-com
+      MSPDir: keyfiles/peerOrganizations/registrar.property.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('registrar-property-com.admin', 'registrar-property-com.peer', 'registrar-property-com.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('registrar-property-com.admin', 'registrar-property-com.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('registrar-property-com.admin')"
+        Endorsement:
+          Type: Signature
+          Rule: "OR('registrar-property-com.peer')"
+
+      AnchorPeers:
+      - Host: 192.168.42.79
+        Port: 7002
+  - &user-property-com
+      Name: user-property-com
+      ID: user-property-com
+      MSPDir: keyfiles/peerOrganizations/user.property.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('user-property-com.admin', 'user-property-com.peer', 'user-property-com.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('user-property-com.admin', 'user-property-com.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('user-property-com.admin')"
+        Endorsement:
+          Type: Signature
+          Rule: "OR('user-property-com.peer')"
+
+      AnchorPeers:
+      - Host: 192.168.42.79
+        Port: 7003
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+
+  Orderer: &OrdererCapabilities
+    V2_0: true
+
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+
+  BatchTimeout: 2s
+
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+
+  Addresses:
+  - 192.168.42.79:7006
+  - 192.168.42.79:7007
+  EtcdRaft:
+    Consenters:
+    - Host: 192.168.42.79
+      Port: 7006
+      ClientTLSCert: keyfiles/ordererOrganizations/property.com/orderers/orderer1.property.com/tls/server.crt
+      ServerTLSCert: keyfiles/ordererOrganizations/property.com/orderers/orderer1.property.com/tls/server.crt
+    - Host: 192.168.42.79
+      Port: 7007
+      ClientTLSCert: keyfiles/ordererOrganizations/property.com/orderers/orderer2.property.com/tls/server.crt
+      ServerTLSCert: keyfiles/ordererOrganizations/property.com/orderers/orderer2.property.com/tls/server.crt
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  OrgChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+      - *registrar-property-com
+      - *user-property-com
+      Capabilities:
+        <<: *ApplicationCapabilities
+
+  OrdererGenesis:
+    <<: *ChannelDefaults
+    Capabilities:
+      <<: *ChannelCapabilities
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+      - *property-com
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+      - <<: *property-com
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+        - *registrar-property-com
+        - *user-property-com

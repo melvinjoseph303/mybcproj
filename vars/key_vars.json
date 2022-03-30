@@ -1,0 +1,93 @@
+{
+  "Admin@property.com": {
+    "key": "Admin@property.com",
+    "org": "property.com",
+    "path": "/home/vars/keyfiles/ordererOrganizations/property.com/users/Admin@property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/ordererOrganizations/property.com/users/Admin@property.com/msp/keystore/priv_sk",
+    "type": "users"
+  },
+  "Admin@registrar.property.com": {
+    "key": "Admin@registrar.property.com",
+    "org": "registrar.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/registrar.property.com/users/Admin@registrar.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/registrar.property.com/users/Admin@registrar.property.com/msp/keystore/priv_sk",
+    "type": "users"
+  },
+  "Admin@user.property.com": {
+    "key": "Admin@user.property.com",
+    "org": "user.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/user.property.com/users/Admin@user.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/user.property.com/users/Admin@user.property.com/msp/keystore/priv_sk",
+    "type": "users"
+  },
+  "orderer1.property.com": {
+    "key": "orderer1.property.com",
+    "org": "property.com",
+    "path": "/home/vars/keyfiles/ordererOrganizations/property.com/orderers/orderer1.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/ordererOrganizations/property.com/orderers/orderer1.property.com/msp/keystore/priv_sk",
+    "type": "orderers"
+  },
+  "orderer2.property.com": {
+    "key": "orderer2.property.com",
+    "org": "property.com",
+    "path": "/home/vars/keyfiles/ordererOrganizations/property.com/orderers/orderer2.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/ordererOrganizations/property.com/orderers/orderer2.property.com/msp/keystore/priv_sk",
+    "type": "orderers"
+  },
+  "peer1.registrar.property.com": {
+    "key": "peer1.registrar.property.com",
+    "org": "registrar.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/registrar.property.com/peers/peer1.registrar.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/registrar.property.com/peers/peer1.registrar.property.com/msp/keystore/priv_sk",
+    "type": "peers"
+  },
+  "peer1.user.property.com": {
+    "key": "peer1.user.property.com",
+    "org": "user.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/user.property.com/peers/peer1.user.property.com/msp/keystore/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/user.property.com/peers/peer1.user.property.com/msp/keystore/priv_sk",
+    "type": "peers"
+  },
+  "property.com": {
+    "key": "property.com",
+    "org": "property.com",
+    "path": "/home/vars/keyfiles/ordererOrganizations/property.com/ca/priv_sk",
+    "pkey": "keyfiles/ordererOrganizations/property.com/ca/priv_sk",
+    "type": "ca"
+  },
+  "property.com.tlsca": {
+    "key": "property.com",
+    "org": "property.com",
+    "path": "/home/vars/keyfiles/ordererOrganizations/property.com/tlsca/priv_sk",
+    "pkey": "keyfiles/ordererOrganizations/property.com/tlsca/priv_sk",
+    "type": "tlsca"
+  },
+  "registrar.property.com": {
+    "key": "registrar.property.com",
+    "org": "registrar.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/registrar.property.com/ca/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/registrar.property.com/ca/priv_sk",
+    "type": "ca"
+  },
+  "registrar.property.com.tlsca": {
+    "key": "registrar.property.com",
+    "org": "registrar.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/registrar.property.com/tlsca/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/registrar.property.com/tlsca/priv_sk",
+    "type": "tlsca"
+  },
+  "user.property.com": {
+    "key": "user.property.com",
+    "org": "user.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/user.property.com/ca/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/user.property.com/ca/priv_sk",
+    "type": "ca"
+  },
+  "user.property.com.tlsca": {
+    "key": "user.property.com",
+    "org": "user.property.com",
+    "path": "/home/vars/keyfiles/peerOrganizations/user.property.com/tlsca/priv_sk",
+    "pkey": "keyfiles/peerOrganizations/user.property.com/tlsca/priv_sk",
+    "type": "tlsca"
+  }
+}

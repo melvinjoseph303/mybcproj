@@ -1,0 +1,459 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-tabs */
+'use strict';
+
+
+const {Contract} = require('fabric-contract-api');
+
+const transactionMap = {
+    upg100 : 100,
+    upg500 : 500,
+    upg1000 : 1000
+};
+
+const propertyStatusMap = {
+    requested : 'REQUESTED',
+    registered : 'REGISTERED',
+    onSale : 'ON_SALE'
+};
+
+
+class UserContract extends Contract {
+
+    /*	constructor() {
+		super('org.property-registration-network.regnet.usercontract');	// Provide a custom name to refer to this smart contract
+    }
+    async instantiate(ctx) {
+		console.log('Regnet User Smart Contract Instantiated');
+	}*/
+
+    /**
+	 * A user registered on the network initiates a transaction to request the registrar to store their details/credentials on the ledger.
+     *
+     * Initiator: User
+     * Output: A ‘Request’ asset on the ledger
+     *
+	 * @param ctx - The transaction context object
+	 * @param name - Name of the User
+	 * @param email - Email ID of the User
+     * @param phoneNo - Phone No of the User
+     * @param aadhaarNo - Aadhaar No of the User
+	 * @returns The transaction will return the User object which got added to blockchain.
+	 */
+    async requestNewUser(ctx, name, email,phoneNo, aadhaarNo) {
+        const mspID = ctx.clientIdentity.getMSPID();
+        //if('usersMSP'!=ctx.clientIdentity.mspId){
+        if(mspID!='user-property-com'){
+        	throw new Error('You are not authorized to perform this operation');
+        }
+
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);	// Create a new composite key for the new User account
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);	// Create a new composite key for the new User account
+        let dataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (dataBuffer.toString()) {
+            throw new Error('Invalid User Details. An user with this name & aadhaarNo already exists.');
+        } else {
+            // Create a user object to be stored in blockchain
+            let newUserObject = {
+                aadhaarNo: aadhaarNo,
+                name: name,
+                email: email,
+                phoneNo:phoneNo,
+                state: 'REQUESTED',
+                createdBy: ctx.clientIdentity.getID(),
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            await ctx.stub.putState(userKey, Buffer.from(JSON.stringify(newUserObject)));
+            return newUserObject;
+        }
+    }
+
+
+	 /**
+	 *
+	 * This transaction is used by a registered user to recharge their account with ‘upgradCoins’.
+	 * Before initiating the transaction, the user needs to pay the price of the ‘upgradCoins’ that they wish to purchase;
+	 * they need to pay this to the network admin. In return, the user will get a Bank Transaction ID, which they need to pass
+	 * as a parameter at the time of initiating the transaction.
+	 *
+	 * Initiator: User
+	 *
+	 * @param ctx - The transaction context
+	 * @param name - Name of the User
+     * @param aadhaarNo - Aadhaar No of the User
+	 * @param bankTransactionId - Bank Transaction ID - Must be pre-defined one
+	 * @returns The transaction will return the current state of user object with updated balance.
+	 */
+    async rechargeUserAccount(ctx, name, aadhaarNo, bankTransactionId) {
+        const mspID = ctx.clientIdentity.getMSPID();
+        //if('usersMSP'!=ctx.clientIdentity.mspId){
+        // eslint-disable-next-line eqeqeq
+        if(mspID!='user-property-com'){
+            throw new Error('You are not authorized to perform this operation');
+        }
+
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);
+        let dataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (!dataBuffer.toString()) {
+            throw new Error('Invalid User Details. No user exists with provided name & aadhaarNo combination.');
+        }
+
+        // Make sure valid Status is provided
+        if(transactionMap[bankTransactionId]){
+            let userObject = JSON.parse(dataBuffer.toString());
+            userObject.upgradCoins += transactionMap[bankTransactionId];
+            await ctx.stub.putState(userKey, Buffer.from(JSON.stringify(userObject)));
+            return userObject;	// Return value of new user account created to user
+
+        } else {
+            throw new Error('Invalid Bank Transaction ID: ' + bankTransactionId + '.');
+        }
+    }
+
+    /**
+	 * Get a User account's details from the blockchain.
+	 *
+	 * Initiator: User or Registrar
+	 *
+	 * @param ctx - The transaction context
+	 * @param name - Name of the User
+     * @param aadhaarNo - Aadhaar No of the User
+	 * @returns The transaction will return the current state of requested user.
+	 */
+    async viewUser(ctx, name, aadhaarNo) {
+
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);
+        let dataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (!dataBuffer.toString()) {
+            throw new Error('Invalid User Details. No user exists with provided name & aadhaarNo combination.');
+        } else {
+            return JSON.parse(dataBuffer.toString());
+        }
+    }
+
+    /**
+	 * This function should be initiated by the user to register the details of their property on the property-registration-network.
+	 *
+	 * Initiator: User
+	 * Output: A ‘Request’ asset on the ledger
+	 *
+	 * @param ctx - The transaction context
+	 * @param propertyId -  Ideally, it should be a string comprising of the geo-coordinates of the property to identify it. However, in this case study, we will be using simple strings such as “001” to identify the property.
+	 * @param owner - The owner of the property.
+	 * @param price - The price of the property
+	 * @param status - Status can take only two values: ‘registered’ and ‘onSale’. When the status of the property is set to ‘registered’, it is not listed for sale; however, when the status of the property is set to ‘onSale’, it is put on sale by its owner.
+	 * @param name - Name of the User
+     * @param aadhaarNo - Aadhaar No of the User
+	 * @returns The transaction will return the current state of newly created property.
+	 */
+    async propertyRegistrationRequest(ctx,propertyId,price,status,name,aadhaarNo){
+
+        const mspID = ctx.clientIdentity.getMSPID();
+        //if('usersMSP'!=ctx.clientIdentity.mspId){
+        if(mspID!='user-property-com'){
+            throw new Error('You are not authorized to perform this operation');
+        }
+
+        // Make sure User does exist.
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);
+        let userDataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (!userDataBuffer.toString()) {
+            throw new Error('Invalid User Details. No user exists with provided name & aadhaarNo combination.');
+        }
+
+        // Make sure Property does not already exist.
+        //let propertyRequestKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.property.request', [propertyId]);
+        let propertyRequestKey = ctx.stub.createCompositeKey('propertychannel', [propertyId]);
+        let propDataBuffer = await ctx.stub.getState(propertyRequestKey).catch(err => console.log(err));
+        if (propDataBuffer.toString()) {
+            throw new Error('Invalid Property Details. We already have a property registered with us for the given Property ID');
+        }
+
+        // Make sure valid Status is provided
+        if(!propertyStatusMap[status]){
+            throw new Error('Invalid Property Status : ' + status + '.');
+        }
+
+        let newPropertyObject = {
+            propertyId: propertyId,
+            price: parseFloat(price),
+            state: propertyStatusMap[status],
+            owner: userKey,
+            assetType:'land',
+            createdBy: ctx.clientIdentity.getID(),
+            createdAt: new Date(),
+            updatedBy: ctx.clientIdentity.getID(),
+            updatedAt: new Date()
+        };
+
+        await ctx.stub.putState(propertyRequestKey, Buffer.from(JSON.stringify(newPropertyObject)));
+        return newPropertyObject;	// Return value of newly added property
+    }
+
+
+
+
+    /**
+	 * This function should be defined to view the current state of any property registered on the ledger.
+	 *
+	 * Initiator: User or Registrar
+	 * Output: A ‘Property’ asset on the ledger
+	 *
+	 * @param ctx - The transaction context
+	 * @param propertyId -  Ideally, it should be a string comprising of the geo-coordinates of the property to identify it. However, in this case study, we will be using simple strings such as “001” to identify the property.
+	 * @returns The transaction will return the current state of any property.
+	 */
+    async viewProperty(ctx,propertyId){
+
+        //let propertyKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.property', [propertyId]);
+        let propertyKey = ctx.stub.createCompositeKey('propertychannel', [propertyId]);
+        let dataBuffer = await ctx.stub.getState(propertyKey).catch(err => console.log(err));
+        if (!dataBuffer.toString()) {// Make sure Property does not already exist.
+            throw new Error('Invalid Property Details. We already have a property registered with us for the given Property ID');
+        }
+        return JSON.parse(dataBuffer.toString());
+    }
+
+    /**
+	 * This function is invoked to change the status of the property.
+	 *
+	 * Initiator:  A registered user who has their property registered on the ledger.
+	 *
+	 * @param ctx - The transaction context
+	 * @param propertyId -  Ideally, it should be a string comprising of the geo-coordinates of the property to identify it. However, in this case study, we will be using simple strings such as “001” to identify the property.
+	 * @param status - Status can take only two values: ‘registered’ and ‘onSale’. When the status of the property is set to ‘registered’, it is not listed for sale; however, when the status of the property is set to ‘onSale’, it is put on sale by its owner.
+	 * @param name - Name of the User
+     * @param aadhaarNo - Aadhaar No of the User
+	 * @returns The transaction will return the current state of any property.
+	 */
+    async updateProperty(ctx,propertyId,status,name,aadhaarNo){
+
+        const mspID = ctx.clientIdentity.getMSPID();
+        //if('usersMSP'!=ctx.clientIdentity.mspId){
+        if(mspID!='user-property-com'){
+            throw new Error('You are not authorized to perform this operation');
+        }
+
+        // Make sure Property does not already exist.
+        //let propertyKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.property', [propertyId]);
+        let propertyKey = ctx.stub.createCompositeKey('propertychannel', [propertyId]);
+        let propDataBuffer = await ctx.stub.getState(propertyKey).catch(err => console.log(err));
+        if (!propDataBuffer.toString()) {
+            throw new Error('Invalid Property Details. We already have a property registered with us for the given Property ID');
+        }
+        // Make sure User does exist.
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);
+        let userDataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (!userDataBuffer.toString()) {
+            throw new Error('Invalid User Details. No user exists with provided name & aadhaarNo combination.');
+        }
+
+        // Make sure valid Status is provided
+        if(!propertyStatusMap[status]){
+            throw new Error('Invalid Property Status : ' + status + '.');
+        }
+
+        let propertyObject = JSON.parse(propDataBuffer.toString());
+        if(userKey == propertyObject.owner){	// Make sure ONLY property owner is making the changes
+            propertyObject.status = propertyStatusMap[status];
+            propertyObject.updatedBy = ctx.clientIdentity.getID();
+            propertyObject.updatedAt = new Date();
+
+            await ctx.stub.putState(propertyKey, Buffer.from(JSON.stringify(propertyObject)));
+            return propertyObject;
+
+        } else {
+            throw new Error('Transaction declied as requested user is not the owner of the property.');
+        }
+    }
+
+
+
+    /**
+	 * This function is invoked to change the status of the property.
+	 *
+	 * Initiator:  A registered user who has their property registered on the ledger.
+	 *
+	 * @param ctx - The transaction context
+	 * @param propertyId -  Ideally, it should be a string comprising of the geo-coordinates of the property to identify it. However, in this case study, we will be using simple strings such as “001” to identify the property.
+	 * @param name - Name of the Buyer
+     * @param aadhaarNo - Aadhaar No of the Buyer
+	 * @returns The transaction will return the current state of any property.
+	 */
+    async purchaseProperty(ctx,propertyId,name,aadhaarNo){
+
+        const mspID = ctx.clientIdentity.getMSPID();
+        //if('usersMSP'!=ctx.clientIdentity.mspId){
+        if(mspID!='user-property-com'){
+            throw new Error('You are not authorized to perform this operation');
+        }
+
+        // Make sure Property does not already exist.
+        //let propertyKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.property', [propertyId]);
+        let propertyKey = ctx.stub.createCompositeKey('propertychannel', [propertyId]);
+        let propDataBuffer = await ctx.stub.getState(propertyKey).catch(err => console.log(err));
+        if (!propDataBuffer.toString()) {
+            throw new Error('Invalid Property Details.');
+        }
+        // Make sure User does exist.
+        //const userKey = ctx.stub.createCompositeKey('org.property-registration-network.regnet.user', [name,aadhaarNo]);
+        const userKey = ctx.stub.createCompositeKey('propertychannel', [name,aadhaarNo]);
+        let userDataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+        if (!userDataBuffer.toString()) {
+            throw new Error('Invalid User Details. No user exists with provided name & aadhaarNo combination.');
+        }
+
+        // Make sure Propert is ON SALE
+        let propertyObject = JSON.parse(propDataBuffer.toString());
+        if(propertyObject.status!=propertyStatusMap.onSale){
+            throw new Error('Property is NOT FOR SALE');
+        }
+
+        if(userKey != propertyObject.owner){
+
+            let userObject = JSON.parse(userDataBuffer.toString());
+
+            if(userObject.upgradCoins >= propertyObject.price){
+
+                let ownerDataBuffer = await ctx.stub.getState(userKey).catch(err => console.log(err));
+                let ownerUserObject = JSON.parse(ownerDataBuffer.toString());
+
+                // DEBIT from BUYER account and CREDIT to owner account
+                userObject.upgradCoins = userObject.upgradCoins - propertyObject.price;
+                ownerUserObject.upgradCoins = ownerUserObject.upgradCoins  + propertyObject.price;
+
+                propertyObject.owner = userKey;
+                propertyObject.status = propertyStatusMap.registered;
+                propertyObject.updatedBy = ctx.clientIdentity.getID();
+                propertyObject.updatedAt = new Date();
+
+                await ctx.stub.putState(userKey, Buffer.from(JSON.stringify(userObject)));
+                await ctx.stub.putState(propertyKey, Buffer.from(JSON.stringify(propertyObject)));
+
+                return propertyObject;
+            }
+            throw new Error('You do not have enough balance to buy this property.');
+        } else {
+            throw new Error('You are already owns this property');
+        }
+    }
+
+
+
+    async queryAllLands(ctx) {
+        const queryString = {
+            selector: {
+                assetType: 'land'
+            },
+            //sort: [{propertyId:'asc'}]
+        };
+
+        let resultIterator = await ctx.stub.getQueryResult(JSON.stringify(queryString));
+
+        let result = await this.getAllResults(resultIterator,false);
+        return JSON.stringify(result);
+    }
+
+    async getLandsWithPagination(ctx,_pageSize,_bookmark) {
+
+        const queryString = {
+            selector: {
+                assetType : 'land'
+            }
+        };
+
+        const pageSize = parseInt(_pageSize,10);
+        const bookmark = _bookmark;
+
+        const {iterator, metadata} = await ctx.stub.getQueryResultWithPagination(
+            JSON.stringify(queryString),
+            pageSize,
+            bookmark
+        );
+
+        const result = await this.getAllResults(iterator,false);
+
+        console.log('Result is ############',result);
+        console.log('Metadata is ##########',metadata);
+
+        const results = {};
+
+        results.Result = result;
+        results.ResponseMetaData = {
+            RecordCount : metadata.fetchedRecordsCount,
+            Bookmark: metadata.bookmark
+        };
+
+        return JSON.stringify(results);
+
+    }
+
+    async getLandHistory(ctx, propertyId) {
+        let resultIterator = await ctx.stub.getHistoryForKey(propertyId);
+        console.log('History is ###',resultIterator);
+        const result = await this.getAllResults(resultIterator, true);
+        //const result = await this.getAllResults(resultIterator, false);
+        return JSON.stringify(result);
+    }
+    /*async getLandHistory(ctx,propertyId) {
+        let iterator = await ctx.stub.getHistoryForKey(propertyId);
+        let result = [];
+        let res = await iterator.next();
+        let obj={};
+        while (!res.done) {
+            if (res.value) {
+                console.info(`found state update with value: ${res.value.value.toString('utf8')}`);
+                //const obj = JSON.parse(res.value.value.toString('utf8'));
+                obj.Key = res.value.key;
+                obj.TxId = res.value.txId;
+                obj.TimeStamp = res.value.timestamp;
+                obj.Record = JSON.parse(res.value.value.toString());
+                result.push(obj);
+            }
+            res = await iterator.next();
+        }
+        await iterator.close();
+        return result;
+    }*/
+    async getAllResults(iterator, isHistory) {
+        let allResults = [];
+
+        for (let res = await iterator.next() ; !res.done; res = await iterator.next())
+        {
+            console.log('Response value is >>>>>>',res);
+            if(res.value && res.value.value.toString()) {
+
+                let jsonRes = {};
+
+                if(isHistory && isHistory === true) {
+                    console.log('The transaction is',res.value);
+
+                    jsonRes.Key = res.value.key;
+                    jsonRes.TxId = res.value.txId;
+                    jsonRes.TimeStamp = res.value.timestamp;
+                    jsonRes.Record = JSON.parse(res.value.value.toString());
+                } else {
+                    jsonRes.Key = res.value.key;
+                    jsonRes.Record = JSON.parse(res.value.value.toString());
+                }
+
+
+                allResults.push(jsonRes);
+            }
+
+        }
+
+        await iterator.close();
+        return allResults;
+    }
+
+}
+
+module.exports = UserContract;

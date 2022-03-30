@@ -1,0 +1,41 @@
+---
+OrdererOrgs:
+  - Name: property.com
+    Domain: property.com
+    Specs:
+      - Hostname: orderer1
+        SANS:
+          - 192.168.42.79
+      - Hostname: orderer2
+        SANS:
+          - 192.168.42.79
+
+PeerOrgs:
+  - Name: registrar.property.com
+    Domain: registrar.property.com
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca1
+      CommonName: ca1.registrar.property.com
+      Country: US
+      Province: North Carolina
+      Locality: Raleigh
+    Specs:
+      - Hostname: peer1
+        CommonName: peer1.registrar.property.com
+        SANS:
+          - 192.168.42.79
+  - Name: user.property.com
+    Domain: user.property.com
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca1
+      CommonName: ca1.user.property.com
+      Country: US
+      Province: North Carolina
+      Locality: Raleigh
+    Specs:
+      - Hostname: peer1
+        CommonName: peer1.user.property.com
+        SANS:
+          - 192.168.42.79
